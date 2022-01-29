@@ -258,30 +258,30 @@ int main() {
                 }
             }
             else if (args[1] == "list") {
-                std::ifstream extfile;
-                extfile.open("./ext/extlist", std::ios::in);
-                std::string line;
-                std::vector<std::string> Content;
+                std::ifstream inFile;
+                inFile.open("./ext/extlist"); 
 
-                while (std::getline(extfile, line)) {
-                    if (line != "")
-                        Content.emplace_back(line);
-                }
-                std::getline(extfile, line);
-                if (line != "")
-                    Content.emplace_back(line);
-                extfile.close();
+                std::stringstream strStream;
+                strStream << inFile.rdbuf(); 
+                std::string str = strStream.str(); 
 
-                if (Content.size() != 0) {
-                    for (int i = 0; i < Content.size() - 1; i++) {
-                        std::cout << "\t" << Content[i] << "\n";
+                int start = 0;
+                int end = str.find("\n");
+                bool notfound = true;
+                while (end != -1) {
+                    if (str.substr(start, end - start) != "") {
+                        std::cout << str.substr(start, end - start) << "\n";
+                        notfound = false;
                     }
+                    start = end + 1;
+                    end = str.find("\n", start);
                 }
-                else {
-                    std::cout << "\tThe list is empty\n";
+                if (str.substr(start, end - start) != "") {
+                    std::cout << str.substr(start, end - start) << "\n";
+                    notfound = false;
                 }
-
-                Content.clear();
+                if (notfound)
+                    std::cout << "The list is empty\n";
             }
             else {
                 errorText("Invalid argument");
@@ -293,10 +293,10 @@ int main() {
             }
             else {
                 if (args[1][1] != ':') {
-                    args[1] = path + args[1];
+                    args[1] = path + "\\" + args[1]; 
                 }
                 if (args[2][1] != ':') {
-                    args[2] = path + args[2];
+                    args[2] = path + "\\" + args[2];
                 }
 
                 std::ifstream path1(args[1]);
