@@ -53,12 +53,14 @@
 
 #endif
 
+#include <Lmcons.h>
+
 int main() {
     system("cls");
 
     SetConsoleTitleA("BetterCMD");
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    std::string command = "", extention = "Main", path ="c:\\";
+    std::string command = "", extention = "Main", path = "c:\\";
 
     SetConsoleTextAttribute(hConsole, 15);
 
@@ -69,19 +71,17 @@ int main() {
     std::cout << " /_____/\\___/\\__/\__/\\____/_/      \\____/_/  /_/_____/  \n";
     std::cout << "\n Github: jasiukiewicztymon | --help\n\n\n";
 
-    std::string usertype;
+    TCHAR username[UNLEN + 1];
+    DWORD username_len = UNLEN + 1;
+    GetUserName(username, &username_len);
 
-    if (access("c:\\", W_OK) == 0) {
-        usertype = "Root";
-    }
-    else {
-        usertype = "User";
-    }
+    std::wstring wusername(&username[0]);
+    std::string usertype(wusername.begin(), wusername.end());
 
     do {
         showHeader(extention, path, usertype);
         getline(std::cin, command);
-  
+
         std::cout << std::endl;
 
         std::stringstream ss(command);
@@ -93,7 +93,7 @@ int main() {
                 [](unsigned char c) { return std::tolower(c); });
             args.emplace_back(splitstr);
         }
-        
+
         if (args[0] == "ext") {
             std::ifstream xfile;
             std::string lines;
@@ -259,11 +259,11 @@ int main() {
             }
             else if (args[1] == "list") {
                 std::ifstream inFile;
-                inFile.open("./ext/extlist"); 
+                inFile.open("./ext/extlist");
 
                 std::stringstream strStream;
-                strStream << inFile.rdbuf(); 
-                std::string str = strStream.str(); 
+                strStream << inFile.rdbuf();
+                std::string str = strStream.str();
 
                 int start = 0;
                 int end = str.find("\n");
@@ -293,7 +293,7 @@ int main() {
             }
             else {
                 if (args[1][1] != ':') {
-                    args[1] = path + "\\" + args[1]; 
+                    args[1] = path + "\\" + args[1];
                 }
                 if (args[2][1] != ':') {
                     args[2] = path + "\\" + args[2];
@@ -313,9 +313,9 @@ int main() {
                 }
 
                 int minSize;
-                if (Path1.size() < Path2.size()) 
+                if (Path1.size() < Path2.size())
                     minSize = Path1.size();
-                else 
+                else
                     minSize = Path2.size();
 
                 for (int j = 0; j < minSize; j++) {
@@ -369,7 +369,7 @@ int main() {
             std::string line;
             ifile.open(spath);
             if (ifile) {
-                while (std::getline(ifile,line)) {
+                while (std::getline(ifile, line)) {
                     std::cout << line << "\n";
                 }
             }
@@ -419,7 +419,9 @@ int main() {
                     isPath(path, args[1]);
             }
         }
-        else if (args[0] == "dir") {
+        else if (args[0] == "dir" || args[0] == "ls") {
+            if (args[0] == "ls")
+                args[0] = "dir";
             if (args.size() == 1) {
                 args[0] += " " + path;
                 system(args[0].c_str());
