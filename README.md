@@ -10,6 +10,19 @@ Create your own extensions and link them to the Better CMD to use them easier...
 - [ ] Path file
 - [ ] Variable system
 
+### Genericals references
+
+| Variable                | Disponibility  |
+|-------------------------|----------------|
+| %SystemDrive%           | ❌  |
+| %ProgramFiles%          | ❌  |
+| %AppData%               | ❌  |
+| %LocalAppData%          | ❌  |
+| %UserProfile%           | ❌  |
+| %UserName%              | ❌  |
+| %COMPUTERNAME%          | ❌  |
+| %PATH%                  | ❌  |
+
 ### Instalation
 
 Launch the exe file and don't worry about the other thing. The Better CMD will create all the folder it need itself
