@@ -64,6 +64,20 @@ void interpret(
                         Val.insert({ splitCommand[0], strvalue.substr(1, strvalue.size() - 3) });
                         std::cout << splitCommand[0] << ": " << strvalue.substr(1, strvalue.size() - 3) << "\n";
                     }
+                    // $variable_name = $other_variable
+                    else if (splitCommand[2][0]== '$' && splitCommand.size() == 3) {
+                        auto val2 = Val.find(splitCommand[2]);
+                        if (val2 == Val.end()) {
+                            errorMsg("Invalid argument\n");
+                        }
+                        else {
+                            Val.insert({ splitCommand[0], val2->second });
+                            std::cout << splitCommand[0] << ": " << val2->second << "\n";
+                        }
+                    }
+                    else {
+                        errorMsg("Invalid argument\n");
+                    }
                 }
                 // existing
                 else {
@@ -76,6 +90,21 @@ void interpret(
                         auto it = Val.find(splitCommand[0]);
                         it->second = strvalue.substr(1, strvalue.size() - 3);
                         std::cout << splitCommand[0] << ": " << strvalue.substr(1, strvalue.size() - 3) << "\n";
+                    }
+                    // $variable_name = $other_variable
+                    else if (splitCommand[2][0] == '$' && splitCommand.size() == 3) {
+                        auto val2 = Val.find(splitCommand[2]);
+                        if (val2 == Val.end()) {
+                            errorMsg("Invalid argument\n");
+                        }
+                        else {
+                            auto it = Val.find(splitCommand[0]);
+                            it->second = val2->second;
+                            std::cout << splitCommand[0] << ": " << val2->second << "\n";
+                        }
+                    }
+                    else {
+                        errorMsg("Invalid argument\n");
                     }
                 }
             }
