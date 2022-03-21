@@ -115,80 +115,76 @@ void interpret(
         @list -add "possible text" | $variable ...
         @list -del "content"
         @list -del $variable
+        Example of change value
+        @list "1" = "content"
+        @list "1" = $variable
+        @list $variable = "content"
+        @list $variable = $variable
+        Example of list
+        @list -list 
+        @list -size
         */
         else if (splitCommand[0][0] == '@') {
-            std::map<std::string, std::vector<std::string>>::iterator it = List.find(splitCommand[0]);
-            if (splitCommand.size() == 1) {
+            if (splitCommand.size() < 2) {
                 errorMsg("Invalid argument\n");
-            }
-            else if (splitCommand[1] == "-add" && splitCommand.size() >= 3) {
-                bool isok = true, isstring = false;
-                std::vector<std::string> Vstr;
-                std::string tempstr;
-
-                for (int i = 2; i < splitCommand.size(); i++) {
-                    if (isstring) {
-
-                    }
-                    else if (splitCommand[i][0] == '$') {
-
-                    }
-                    else if (splitCommand[i][0] == '@') {
-
-                    }
-                    else if (splitCommand[i][0] == '"') {
-                        if (splitCommand[i][splitCommand[i].size() - 1] == '"') {
-                            Vstr.emplace_back(splitCommand[i].substr(1, splitCommand[i].size() - 1));
-                        }
-                        else {
-                            tempstr = splitCommand[i].substr(1, splitCommand[i].size());
-                            isstring = true;
-                        }
-                    }
-                    else {
-                        isok = false;
-                        break;
-                    }
-                }
-
-                if (isok && !isstring) {
-                    if (it == List.end()) {
-                        List.insert(std::pair<std::string, std::vector<std::string>>(splitCommand[0], Vstr));
-                    }
-                    else {
-                        for (int j = 0; j < Vstr.size(); j++) {
-                            it->second.emplace_back(Vstr[j]);
-                        }
-                    }
-                }
-            }
-            else if (splitCommand[1] == "-del" && splitCommand.size() == 3) {
-                auto vfind = std::find(it->second.begin(), it->second.end(), splitCommand[2]);
-                it->second.erase(vfind);
-            }
-            else if (splitCommand[1] == "-list" && splitCommand.size() == 2) {
-                auto ittemp = List.find(splitCommand[0]);
-                if (ittemp != List.end()) {
-                    for (int i = 0; i < ittemp->second.size(); i++) {
-                        std::cout << List.find(splitCommand[0])->second[i] << ";";
-                    }
-                    std::cout << "\n";
-                }
-                else {
-                    errorMsg("Invalid list name\n");
-                }
-            }
-            else if (splitCommand[1] == "-size" && splitCommand.size() == 2) {
-                auto ittemp = List.find(splitCommand[0]);
-                if (ittemp != List.end()) {
-                    std::cout << ittemp->second.size() << "\n";
-                }
-                else {
-                    errorMsg("Invalid list name\n");
-                }
             }
             else {
-                errorMsg("Invalid argument\n");
+                auto it = List.find(splitCommand[0]);
+                if (it == List.end()) {
+                    if (splitCommand[1] == "-add" && splitCommand.size() > 2) {
+                        std::vector<std::string> instr;
+                        std::string temp;
+
+                        // split | to get values
+
+                        for (int i = 2; i < splitCommand.size(); i++) {
+                            if (splitCommand[i] != "|") {
+                                temp += splitCommand[i] + " ";
+                            }
+                            else {
+                                instr.emplace_back(temp.substr(1, temp.size() - 3));
+                                temp = "";
+                            }
+                        }
+                        instr.emplace_back(temp.substr(1, temp.size() - 3));
+                        temp = "";
+
+                        std::cout << splitCommand[0] << ": ";
+                        for (int i = 0; i < instr.size() - 1; i++) {
+                            std::cout << instr[i] << " | ";
+                        }
+                        std::cout << instr[instr.size() - 1] << "\n";
+
+                        List.insert({ splitCommand[0], instr });
+                        instr.clear();
+                    }
+                    else if (splitCommand[1] == "-list" || splitCommand[1] == "-del") {
+                        errorMsg("Invalid argument\n");
+                    }
+                    else if (splitCommand[1][0] == '"' || splitCommand[1][0] == '$') {
+                        errorMsg("Invalid argument\n");
+                    }
+                    else {
+                        errorMsg("Invalid argument\n");
+                    }
+                }
+                else {
+                    if (splitCommand[1] == "-add") {
+                    }
+                    else if (splitCommand[1] == "-list") {
+                        std::cout << splitCommand[0] << ": ";
+                        for (int i = 0; i < it->second.size() - 1; i++) {
+                            std::cout << it->second[i] << " | ";
+                        }
+                        std::cout << it->second[it->second.size() - 1] << "\n";
+                    }
+                    else if (splitCommand[1][0] == '"' || splitCommand[1][0] == '$') {
+                        errorMsg("Invalid argument\n");
+                    }
+                    else {
+                        errorMsg("Invalid argument\n");
+                    }
+                }
             }
         }
         else {
