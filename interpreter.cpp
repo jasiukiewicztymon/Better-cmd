@@ -130,33 +130,72 @@ void interpret(
             }
             else {
                 auto it = List.find(splitCommand[0]);
+
+                // new liste
                 if (it == List.end()) {
                     if (splitCommand[1] == "-add" && splitCommand.size() > 2) {
                         std::vector<std::string> instr;
                         std::string temp;
+                        bool EmplaceError = false;
 
                         // split | to get values
 
-                        for (int i = 2; i < splitCommand.size(); i++) {
-                            if (splitCommand[i] != "|") {
-                                temp += splitCommand[i] + " ";
+                        if (List.find(splitCommand[0]) == List.end()) {
+                            for (int i = 2; i < splitCommand.size(); i++) {
+                                if (splitCommand[i] != "|") {
+                                    temp += splitCommand[i] + " ";
+                                }
+                                else {
+                                    if (temp[0] == '"' && temp[temp.size() - 2] == '"') {
+                                        instr.emplace_back(temp.substr(1, temp.size() - 3));
+                                    }
+                                    else if (temp[0] == '$') {
+                                        auto it = Val.find(temp.substr(0, temp.size() - 1));
+                                        if (it == Val.end()) {
+                                            EmplaceError = true;
+                                            break;
+                                        }
+                                        else {
+                                            instr.emplace_back(it->second);
+                                        }
+                                    }
+                                    else {
+                                        EmplaceError = true;
+                                        break;
+                                    }
+                                    temp = "";
+                                }
+                            }
+                            if (temp[0] == '"' && temp[temp.size() - 2] == '"') {
+                                instr.emplace_back(temp.substr(1, temp.size() - 3));
+                            }
+                            else if (temp[0] == '$') {
+                                auto it = Val.find(temp.substr(0, temp.size() - 1));
+                                if (it == Val.end()) {
+                                    EmplaceError = true;
+                                }
+                                else {
+                                    instr.emplace_back(it->second);
+                                }
                             }
                             else {
-                                instr.emplace_back(temp.substr(1, temp.size() - 3));
-                                temp = "";
+                                EmplaceError = true;
                             }
-                        }
-                        instr.emplace_back(temp.substr(1, temp.size() - 3));
-                        temp = "";
+                            temp = "";
 
-                        std::cout << splitCommand[0] << ": ";
-                        for (int i = 0; i < instr.size() - 1; i++) {
-                            std::cout << instr[i] << " | ";
-                        }
-                        std::cout << instr[instr.size() - 1] << "\n";
+                            if (!EmplaceError) {
+                                std::cout << splitCommand[0] << ": ";
+                                for (int i = 0; i < instr.size() - 1; i++) {
+                                    std::cout << instr[i] << " | ";
+                                }
+                                std::cout << instr[instr.size() - 1] << "\n";
+                            }
+                            else {
+                                errorMsg("Invalid list argument\n");
+                            }
 
-                        List.insert({ splitCommand[0], instr });
-                        instr.clear();
+                            instr.clear();
+                        }
                     }
                     else if (splitCommand[1] == "-list" || splitCommand[1] == "-del") {
                         errorMsg("Invalid argument\n");
