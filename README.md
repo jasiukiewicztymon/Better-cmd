@@ -4,6 +4,8 @@ Create your own extensions and link them to the Better CMD to use them easier...
 
 **If you want do a command proposition in Issues section**
 
+![bettercmd](https://user-images.githubusercontent.com/73474137/160302062-a25b7b91-fb54-4270-93ba-6a91ad12c8e7.png)
+
 ### TO DO:
 
 - [ ] Extension template cpp file
